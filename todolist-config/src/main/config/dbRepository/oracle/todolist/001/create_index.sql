@@ -1,0 +1,1 @@
+CREATE INDEX idx_Todo ON SC_Todo (instanceId, id);
