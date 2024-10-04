@@ -5,7 +5,6 @@ import com.silverpeas.web.ResourceDeletionTest;
 import com.stratelia.webactiv.beans.admin.UserDetail;
 import org.junit.Before;
 import org.junit.Test;
-import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.components.todolist.repository.TodoRepository;
 
 import static com.silverpeas.web.TestResources.getTestResources;

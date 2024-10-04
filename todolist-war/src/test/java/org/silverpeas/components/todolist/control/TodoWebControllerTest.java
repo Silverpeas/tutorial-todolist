@@ -16,7 +16,6 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.core.admin.OrganisationController;
 import org.silverpeas.core.admin.OrganisationControllerFactory;
 import org.silverpeas.persistence.jpa.RepositoryBasedTest;
@@ -58,11 +57,6 @@ public class TodoWebControllerTest extends RepositoryBasedTest {
   @Override
   public String getDataSetPath() {
     return "org/silverpeas/components/todolist/todolist-dataset.xml";
-  }
-
-  @Override
-  public String[] getApplicationContextPath() {
-    return new String[]{"/spring-todolist.xml", "/spring-todolist-embedded-datasource.xml"};
   }
 
   @Test

@@ -1,7 +1,7 @@
 package org.silverpeas.components.todolist.mock;
 
-import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.components.todolist.repository.TodoRepository;
+import org.silverpeas.kernel.annotation.NonNull;
 import org.silverpeas.persistence.repository.OperationContext;
 
 import javax.inject.Named;
@@ -22,6 +22,7 @@ public class TodoRepositoryMockWrapper extends TodoRepository {
   }
 
   @Override
+  @NonNull
   public List<Todo> getAllTodoInTodoList(final String todolistId) {
     return mock.getAllTodoInTodoList(todolistId);
   }

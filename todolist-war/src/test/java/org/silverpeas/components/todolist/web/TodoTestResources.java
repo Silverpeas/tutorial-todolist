@@ -3,9 +3,7 @@ package org.silverpeas.components.todolist.web;
 import com.silverpeas.web.TestResources;
 import com.stratelia.webactiv.beans.admin.UserDetail;
 import org.silverpeas.components.todolist.mock.TodoRepositoryMockWrapper;
-import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.components.todolist.repository.TodoRepository;
-import org.silverpeas.components.todolist.repository.TodoRepositoryProvider;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.inject.Named;
@@ -21,7 +19,6 @@ import static org.mockito.Mockito.when;
 public class TodoTestResources extends TestResources {
 
   public static final String JAVA_PACKAGE = "org.silverpeas.components.todolist.web";
-  public static final String SPRING_CONTEXT = "spring-todolist-webservice.xml";
   public static final String COMPONENT_INSTANCE_ID = "todolist3";
   public static final String TODO_ID = "todo_1";
 
@@ -49,7 +46,7 @@ public class TodoTestResources extends TestResources {
 
   public TodoRepository getTodoRepository() {
     TodoRepositoryMockWrapper mockWrapper =
-        (TodoRepositoryMockWrapper) TodoRepositoryProvider.getTodoRepository();
+        (TodoRepositoryMockWrapper) TodoRepository.get();
     return mockWrapper.getMock();
   }
 }

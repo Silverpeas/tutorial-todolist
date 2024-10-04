@@ -37,7 +37,7 @@ import com.stratelia.silverpeas.peasCore.servlets.annotation.RedirectToInternal;
 import com.stratelia.silverpeas.peasCore.servlets.annotation.RedirectToInternalJsp;
 import com.stratelia.silverpeas.peasCore.servlets.annotation.WebComponentController;
 import com.stratelia.webactiv.SilverpeasRole;
-import org.silverpeas.components.todolist.TodoComponentSettings;
+import org.silverpeas.components.todolist.TodolistSettings;
 import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.components.todolist.model.TodoList;
 
@@ -52,7 +52,7 @@ import java.util.List;
  * It takes in charge, per user, the web navigation of the user in the application. It is a session
  * scoped bean; it is instantiated for each user session.
  */
-@WebComponentController(TodoComponentSettings.COMPONENT_NAME)
+@WebComponentController(TodolistSettings.COMPONENT_NAME)
 public class TodoWebController extends
     com.stratelia.silverpeas.peasCore.servlets.WebComponentController<TodoWebRequestContext> {
 
@@ -65,8 +65,8 @@ public class TodoWebController extends
    */
   public TodoWebController(MainSessionController mainSessionCtrl,
     ComponentContext componentContext) {
-    super(mainSessionCtrl, componentContext, TodoComponentSettings.MESSAGES_PATH,
-    TodoComponentSettings.ICONS_PATH, TodoComponentSettings.SETTINGS_PATH);
+    super(mainSessionCtrl, componentContext, TodolistSettings.MESSAGES_PATH,
+    TodolistSettings.ICONS_PATH, TodolistSettings.SETTINGS_PATH);
     String componentId = componentContext.getCurrentComponentId();
     this.currentTodoList = TodoList.getById(componentId);
   }
@@ -118,7 +118,7 @@ public class TodoWebController extends
   public void addTodo(TodoWebRequestContext context) {
     String description = context.getRequest().getParameter("description").trim();
     TodoList todoList = getCurrentTodoList();
-    todoList.addTodo(context.getUser(), description);
+    todoList.addTodo(new Todo(context.getUser(), "", description));
   }
 
   @POST

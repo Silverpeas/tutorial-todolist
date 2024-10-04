@@ -4,11 +4,8 @@ import com.silverpeas.web.ResourceCreationTest;
 import com.stratelia.webactiv.beans.admin.UserDetail;
 import org.junit.Before;
 import org.junit.Test;
-import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.components.todolist.repository.TodoRepository;
 import org.silverpeas.persistence.repository.OperationContext;
-
-import java.net.URI;
 
 import static com.silverpeas.web.TestResources.getTestResources;
 import static org.mockito.Matchers.any;

@@ -5,9 +5,7 @@ import com.silverpeas.web.ResourceGettingTest;
 import com.stratelia.webactiv.beans.admin.UserDetail;
 import org.junit.Before;
 import org.junit.Test;
-import org.silverpeas.components.todolist.model.Todo;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 

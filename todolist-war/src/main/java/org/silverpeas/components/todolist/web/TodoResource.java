@@ -56,7 +56,7 @@ public class TodoResource extends RESTWebService {
   @Produces(MediaType.APPLICATION_JSON)
   public List<TodoEntity> addTodo(TodoEntity todo) {
     TodoList todoList = TodoList.getById(getComponentId());
-    todoList.addTodo(getUserDetail(), todo.getDescription());
+    todoList.addTodo(new Todo(getUserDetail(), "", todo.getDescription()));
     return asWebEntities(todoList.getAllTodos());
   }
 

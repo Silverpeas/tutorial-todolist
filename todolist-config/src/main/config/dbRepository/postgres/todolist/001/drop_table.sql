@@ -1,1 +1,0 @@
-DROP TABLE SC_Todo;
