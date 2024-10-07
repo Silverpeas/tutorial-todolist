@@ -36,6 +36,7 @@ import org.silverpeas.core.annotation.Service;
  *
  * @author mmoquillon
  */
+// For instance, only events about the creation of todos are fired. TODO implement the others notifications
 @Service
 public class SubscriberNotification extends TodoEventListener {
 
