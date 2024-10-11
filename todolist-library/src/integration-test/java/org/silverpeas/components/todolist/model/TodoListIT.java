@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.silverpeas.components.todolist.TodolistWarBuilder;
+import org.silverpeas.components.todolist.TodolistLibWarBuilder;
 import org.silverpeas.core.admin.user.model.User;
 import org.silverpeas.core.admin.user.model.UserDetail;
 import org.silverpeas.core.cache.service.CacheAccessorProvider;
@@ -105,7 +105,7 @@ public class TodoListIT {
   /**
    * We build here the deployment artefact (a WAR archive in our case) with all the code and
    * resources required by the integration tests. The build is usually delegated to a deployment
-   * archive builder (here the {@link TodolistWarBuilder} object).
+   * archive builder (here the {@link TodolistLibWarBuilder} object).
    * <p>
    * Because the failure of the deployments isn't correctly traced by Arquillian, we wrap the build
    * of the archive by a try-catch statement in order to catch and output the error.
@@ -116,7 +116,7 @@ public class TodoListIT {
   @Deployment
   public static Archive<?> createTestArchive() {
     try {
-      return TodolistWarBuilder.onWarForTestClass(TodoListIT.class)
+      return TodolistLibWarBuilder.onWarForTestClass(TodoListIT.class)
           .addAsResource(DATABASE_SCRIPT.substring(1))
           .addAsResource(DATASET_SCRIPT.substring(1))
           .build();

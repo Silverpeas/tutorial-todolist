@@ -41,6 +41,12 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.silverpeas.components.todolist</groupId>
+      <artifactId>silverpeas-todolist</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.silverpeas.core</groupId>
       <artifactId>silverpeas-core-rs</artifactId>
       <version>${core.version}</version>
@@ -53,12 +59,16 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.silverpeas.components.todolist</groupId>
-      <artifactId>silverpeas-todolist</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
+      <groupId>org.silverpeas.core</groupId>
+      <artifactId>silverpeas-core-web-test</artifactId>
+      <version>${core.version}</version>
+      <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-html</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

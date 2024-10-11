@@ -21,19 +21,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.silverpeas.components.todolist.control;
+package org.silverpeas.components.todolist;
 
-import org.silverpeas.core.web.mvc.webcomponent.WebComponentRequestContext;
+import org.silverpeas.components.todolist.model.TodoList;
+import org.silverpeas.components.todolist.service.TodoIndexation;
+import org.silverpeas.core.admin.component.model.SilverpeasComponentInstance;
+import org.silverpeas.core.annotation.Service;
+import org.silverpeas.core.web.index.components.ComponentIndexation;
+import org.silverpeas.kernel.annotation.Technical;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
- * The execution context of an incoming HTTP request in regards of the application. Any specific
- * functions related to the context of the HTTP request and to the application instance have to be
- * implemented here. Some methods can be also overridden to satisfy some specific rule. For example,
- * the {@link WebComponentRequestContext#beforeRequestProcessing()} can be overridden to prepare or
- * initialize some resources before passing the control to the web controller.
+ * The indexer is in charge of the indexation of all the todos managed by this application. Is is
+ * invoked when an administrator asks to reindex all the resources managed by the application
+ * instance.
  */
-public class TodoWebRequestContext extends
-    WebComponentRequestContext<TodoWebController> {
+@Technical
+@Service
+@Singleton
+@Named("todolist" + ComponentIndexation.QUALIFIER_SUFFIX)
+public class TodolistIndexer implements ComponentIndexation {
 
+  @Inject
+  private TodoIndexation indexation;
 
+  @Override
+  public void index(SilverpeasComponentInstance silverpeasComponentInstance) {
+    TodoList todoList = TodoList.getById(silverpeasComponentInstance.getId());
+    todoList.getAllTodos().forEach(indexation::index);
+  }
 }

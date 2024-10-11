@@ -72,19 +72,23 @@ public class TodoIndexation extends TodoEventListener {
     index(created);
   }
 
-  private void index(Todo todo) {
-    if (todo.isIndexable()) {
+  /**
+   * Indexes the specified task to do.
+   * @param theTodo the task to index
+   */
+  public void index(Todo theTodo) {
+    if (theTodo.isIndexable()) {
       // always check the entity is indexable. Indeed, this attribute can be computed from some
       // entity properties and, with as the application can evolve over time, we ensure here to
       // take into account any possible evolutions
-      String appId = todo.getIdentifier().getComponentInstanceId();
+      String appId = theTodo.getIdentifier().getComponentInstanceId();
       FullIndexEntry indexEntry =
-          new FullIndexEntry(new IndexEntryKey(appId, todo.getContributionType(),
-              todo.getId()));
-      indexEntry.setTitle(todo.getTitle());
-      indexEntry.setPreview(todo.getDescription());
-      indexEntry.setCreationDate(todo.getCreationDate());
-      indexEntry.setCreationUser(todo.getCreatorId());
+          new FullIndexEntry(new IndexEntryKey(appId, theTodo.getContributionType(),
+              theTodo.getId()));
+      indexEntry.setTitle(theTodo.getTitle());
+      indexEntry.setPreview(theTodo.getDescription());
+      indexEntry.setCreationDate(theTodo.getCreationDate());
+      indexEntry.setCreationUser(theTodo.getCreatorId());
 
       IndexEngineProxy.addIndexEntry(indexEntry);
     }
