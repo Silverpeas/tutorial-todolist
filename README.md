@@ -118,7 +118,7 @@ The web layer is usually composed of two parts:
 * The Web front-end which is also made up of two parts:
     * The server-side to answer the request coming from the client-side and which is built atop of
       the Silverpeas MVC framework;
-    * The client-side which provides the user with web UI to interact with the application and
+    * The client-side to provide the user with web UI to interact with the application and
       which is made up of JSP pages, Javascript files, and CSS and pictures resources.
 
 ### The REST-based web services
@@ -141,18 +141,20 @@ tests like forbidden access, non-existing resource access, and so on.
 
 The front-end in Silverpeas is made up of two sublayers:
 
-* the Web pages with which the user interact with the application and running within a web browser;
-* the MVC framework listening for HTTP requests coming from the web pages to trigger the
-  asked functions of the application
+* The Web pages with which the user interact with the application and running within a web browser;
+* The MVC framework listening for HTTP requests coming from the web pages to trigger the
+  asked functions of the application and to redirect the user to the next web pages or on an
+  updated part of the web page.
 
 #### The Web pages
 
 Web pages generation is based on the following approach:
 
 * Silverpeas provides a canvas along with a look&feel for the applications web UI;
-* The HTML page is generated with an initial content from the business data on the server-side;
+* The HTML page is generated with possibly an initial content from the business data on the
+  server-side;
 * The dynamic of the HTML pages is driven by Javascript on the client-side and the content is
-  updated by AJAX.
+  updated and possibly loaded by AJAX.
 
 Silverpeas still uses the old JSP and JSTL technologies to generate the HTML pages because they
 are the mode efficient and flexible way for this purpose in the Java world. The counterpart of
@@ -166,31 +168,52 @@ and Javascript codes, and CSS/Javascript inclusion, satisfying by the way the co
 Silverpeas, several sets of custom JSTL are provided (`silverfunction`, `viewgenerator`, ...)
 along with the default JSTL.
 
+The web pages generated for a given application are rendered within the layout of the Silverpeas
+main web page. According to the interaction of the user with some parts of the main web page,
+one or several parts within the layout can be updated (by requesting the corresponding web
+controllers (see later)).
+
 The dynamic of Web pages is motorized by both plain Javascript, JQuery and VueJS. (Because
 previously the dynamic was driven by AngularJS, there is again some codes in Silverpeas using
 this old and deprecated Javascript framework.) Silverpeas provides a custom Javascript framework
 built atop of both plain Javascript, JQuery and VueJS in order to make the writing of UI
 interactions easier without having to worry about a lot of details peculiar to Silverpeas. The goal
-of the framework with VueJS code in the applications is to give them a more web component-oriented
-approach.
+of the framework with VueJS code in the applications is to give them a more web
+component-oriented and asynchronous approach. Therefore, a knowledge of the Silverpeas framework
+is required to profit of all of its capabilities.
+
+In this project, the application is a single-page one, generated from the `home.jsp` JSP. The
+whole UI rendering and interaction in this web page is performed by a custom view plugin,
+`todolist_plugin`, that is defined and registered by the `TodolistJavascriptPluginRegistering` Java
+code, and that is declared in the single page of the application. This plugin defines the
+VueJS web component *todolist* dedicated to manage in the client side the todos of a todolist. 
+It is made up of the following parts, all of them defined in the *todolist/jsp/javascript/vuejs* 
+directory in the web root folder:
+
+* `silverpeas-todolist-template.jsp` in which are defined the different view components of the
+  web component *todolist*;
+* `silverpeas-todolist.css` in which are defined the look of the different view components and 
+  their inner parts;
+* `silverpeas-todolist.js` in which is defined the behavior (and hence the user interaction) of 
+  the web component *todolist*.
 
 #### The MVC framework
 
 Since its inception, Silverpeas provides a custom MVC framework. The first one was developed at
 the time Struts didn't yet existed. It was composed of two bricks:
 
-* The request router whose goal is to translate the incoming user request to a function to
-  invoke on the controller;
-* The controller whose goal is to delegate the invoked function to one or more calls on
-  the business layers of the application and of Silverpeas. The controller is user session
-  life-scoped; this is why it is also named *session controller*.
+* The request router whose goal is to translate the incoming user request to an application
+  function on the controller;
+* The controller whose goal is to delegate the application function requested by the user from the
+  UI to one or more calls on the business layers of the application and of Silverpeas. The
+  controller is user session life-scoped; this is why it is also named *session controller*.
 
 Currently, Silverpeas provides a second version of the MVC framework, based upon the first one,
 but providing some facilities and with a more modern programming approach :
 
-* No need to write a request router, the generic one, `WebComponentRequestRouter`, is used and
-  for this requires to be declared, with the web controller with which it is mapped, within the
-  `web.xml` web descriptor of the application;
+* No need to write a request router: the generic one, `WebComponentRequestRouter`, is used and
+  for this it requires to be declared as serving the root URL of the application, with the
+  web controller with which it has to be mapped, in the `web.xml` web descriptor of the application;
 * The web component request context which provides useful methods (like, for example, getting the
   highest roles the user play in the application instance) and access to the HTTP request and
   response. The request context is always passed as the single parameter to the session
@@ -207,8 +230,7 @@ but providing some facilities and with a more modern programming approach :
   invoke before or after a controller's function or the next navigation step in the current
   request processing flow.
 
-
-
-
-  
+In this tutorial, the web controller, `TodoListWebController` is only used to redirect to the home
+page `home.jsp` of the application. All the interaction and the todolist rendering is performed by
+specific VueJS components in an asynchronous way.
 

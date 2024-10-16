@@ -25,6 +25,8 @@ package org.silverpeas.components.todolist.web;
 
 import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.core.web.rs.WebEntity;
+import org.silverpeas.core.webapi.util.UserEntity;
+import org.silverpeas.kernel.util.StringUtil;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -39,6 +41,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static org.silverpeas.kernel.util.StringUtil.isDefined;
+
 /**
  * The web entity representing a task to do. Such entities are carries by HTTP requests and
  * responses and are usually encoded in JSON. Nevertheless, in order to support both XML and JSON
@@ -48,7 +52,7 @@ import java.util.function.Supplier;
  * @author mmoquillon
  */
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.NONE)
 public class TodoEntity implements WebEntity {
 
   @XmlElement(nillable = true)
@@ -59,15 +63,17 @@ public class TodoEntity implements WebEntity {
   @NotNull
   @Size(min = 1, max = 2000)
   private String description;
+  @XmlElement(required = true)
+  @NotNull
+  private UserEntity author;
   @XmlElement(nillable = true)
-  private String authorName;
   private String title;
 
   protected TodoEntity(final Todo todo) {
     this.id = todo.getId();
     this.title = todo.getTitle();
     this.description = todo.getDescription();
-    this.authorName = todo.getCreator().getDisplayedName();
+    this.author = new UserEntity(todo.getCreator());
   }
 
   @SuppressWarnings("unused")
@@ -97,8 +103,8 @@ public class TodoEntity implements WebEntity {
    * Constructs a list of web entity representations of the specified todos.
    *
    * @param todos a list of todos to represent
-   * @param uriBuilderSupplier a supplier of a builder of URI initialized with the base URI of
-   * the todolist web resource.
+   * @param uriBuilderSupplier a supplier of a builder of URI initialized with the base URI of the
+   * todolist web resource.
    * @return a list with all the web entities
    */
   public static List<TodoEntity> fromTodos(final List<Todo> todos,
@@ -115,6 +121,23 @@ public class TodoEntity implements WebEntity {
     return this;
   }
 
+  /**
+   * Is this task a new one?
+   *
+   * @return true if this task doesn't exist in the referred todolist, false otherwise.
+   */
+  public boolean isNew() {
+    return StringUtil.isDefined(this.id);
+  }
+
+  /**
+   * Is the data of this task are valid?
+   * @return true if all the required properties are defined, false otherwise.
+   */
+  public boolean isValid() {
+    return isDefined(title) && isDefined(description) && author != null;
+  }
+
   public String getDescription() {
     return description;
   }
@@ -123,12 +146,16 @@ public class TodoEntity implements WebEntity {
     return id;
   }
 
-  public String getAuthorName() {
-    return authorName;
+  public UserEntity getAuthor() {
+    return author;
   }
 
   public String getTitle() {
     return title;
+  }
+
+  public void setDescription(String newDescription) {
+    this.description = newDescription;
   }
 
   @Override
@@ -138,12 +165,23 @@ public class TodoEntity implements WebEntity {
     return Objects.equals(uri, that.uri)
         && Objects.equals(id, that.id)
         && Objects.equals(description, that.description)
-        && Objects.equals(authorName, that.authorName)
+        && Objects.equals(author.getId(), that.author.getId())
         && Objects.equals(title, that.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(uri, id, description, authorName, title);
+    return Objects.hash(uri, id, description, author.getId(), title);
+  }
+
+  @Override
+  public String toString() {
+    return "TodoEntity{" +
+        "uri=" + uri +
+        ", id='" + id + '\'' +
+        ", description='" + description + '\'' +
+        ", author=" + author.getId() +
+        ", title='" + title + '\'' +
+        '}';
   }
 }

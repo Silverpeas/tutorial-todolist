@@ -1,5 +1,6 @@
 package org.silverpeas.components.todolist.web;
 
+import org.hamcrest.Matchers;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -12,6 +13,7 @@ import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.core.admin.user.model.User;
 import org.silverpeas.web.test.ResourceGettingTest;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -73,6 +75,29 @@ public class TodoListResourceGettingIT extends ResourceGettingTest {
     assertThat(expectedTodos, containsInAnyOrder(actualTodos));
   }
 
+  @Test
+  public void getAnExistingTodo() {
+    TodoEntity expectedTodo = expectedTodos.get(1);
+    String uri = aResourceURI() + "/" + expectedTodo.getId();
+    Response response = getAt(uri , Response.class);
+    assertThat(response.getStatus(), is(STATUS_OK));
+
+    TodoEntity actualTodo = response.readEntity(TodoEntity.class);
+    assertThat(actualTodo, is(expectedTodo));
+  }
+
+  @Test
+  public void getANonExistingTodo() {
+    String uri = aResourceURI() + "/UUID-6";
+    try {
+      getAt(uri, Response.class);
+    } catch (WebApplicationException ex) {
+      int receivedStatus = ex.getResponse().getStatus();
+      int notFound = Response.Status.BAD_REQUEST.getStatusCode();
+      assertThat(receivedStatus, is(notFound));
+    }
+  }
+
   @Override
   public String[] getExistingComponentInstances() {
     return new String[]{TestContext.TODOLIST_ID};
@@ -85,7 +110,7 @@ public class TodoListResourceGettingIT extends ResourceGettingTest {
 
   @Override
   public String anUnexistingResourceURI() {
-    return TodoListResource.PATH + "/666";
+    return TodoListResource.PATH + "/todolist666";
   }
 
   @Override
@@ -97,7 +122,6 @@ public class TodoListResourceGettingIT extends ResourceGettingTest {
   public String getAPITokenValue() {
     return authToken;
   }
-
 
   @Override
   public Class<TodoEntity[]> getWebEntityClass() {

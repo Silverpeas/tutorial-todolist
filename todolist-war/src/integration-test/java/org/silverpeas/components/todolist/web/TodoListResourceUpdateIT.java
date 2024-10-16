@@ -34,25 +34,25 @@ import org.silverpeas.components.todolist.TestContext;
 import org.silverpeas.components.todolist.TodolistWarBuilder;
 import org.silverpeas.components.todolist.model.Todo;
 import org.silverpeas.core.admin.user.model.User;
-import org.silverpeas.web.test.ResourceCreationTest;
+import org.silverpeas.core.persistence.datasource.model.identifier.UuidIdentifier;
+import org.silverpeas.kernel.test.util.Reflections;
+import org.silverpeas.web.test.ResourceUpdateTest;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.util.regex.Pattern;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
- * Integration test on the creation of todos by using the REST-based web services. This test class
- * extends {@link ResourceCreationTest} in which are defined a set of tests on usual errors with
+ * Integration test on the update of todos by using the REST-based web services. This test class
+ * extends {@link ResourceUpdateTest} in which are defined a set of tests on usual errors with
  * web services requesting (resource not found, resource unauthorized, and so).
  */
 @RunWith(Arquillian.class)
-public class TodoListResourceCreationIT extends ResourceCreationTest {
-
-  private static final int STATUS_OK = Response.Status.CREATED.getStatusCode();
+public class TodoListResourceUpdateIT extends ResourceUpdateTest {
 
   private final TestContext testContext = new TestContext();
   private String authToken;
@@ -60,7 +60,7 @@ public class TodoListResourceCreationIT extends ResourceCreationTest {
 
   @Deployment
   public static Archive<?> createTestArchive() {
-    return TodolistWarBuilder.onWarForTestClass(TodoListResourceCreationIT.class)
+    return TodolistWarBuilder.onWarForTestClass(TodoListResourceUpdateIT.class)
         .addRESTWebServiceEnvironment()
         .addAsResource(TestContext.DATABASE_SCRIPT.substring(1))
         .addAsResource(TestContext.DATASET_SCRIPT.substring(1))
@@ -81,39 +81,28 @@ public class TodoListResourceCreationIT extends ResourceCreationTest {
   public void prepareTestResources() {
     User requester = User.getById("1");
     authToken = getTokenKeyOf(requester);
-    Todo todo = testContext.computeNewTodo(requester);
-    expectedEntity = new TodoEntity(todo);
+    Todo todo = testContext.getExistingTodo();
+    expectedEntity = TodoEntity.fromTodo(todo,
+        getWebResourceBaseURIBuilder().path(TodoListResource.PATH).path(TestContext.TODOLIST_ID));
   }
 
   @Test
-  public void addANewTodo() {
-    Pattern uriPattern = Pattern.compile(
-        "^http://localhost:8080/silverpeas/services/" + aResourceURI() + "/[a-z0-9\\-]+$");
-    var todosBefore = testContext.getAllExistingTodos();
-
-    try (Response response = post(aResource(), aResourceURI())) {
-      assertThat(response.getStatus(), is(STATUS_OK));
-
-      TodoEntity[] actualTodos = response.readEntity(TodoEntity[].class);
-      assertThat(actualTodos, notNullValue());
-      assertThat(actualTodos.length, is(todosBefore.size() + 1));
-
-      TodoEntity createdTodo = actualTodos[actualTodos.length - 1];
-      assertThat(createdTodo.getURI(), is(response.getLocation()));
-      assertThat(uriPattern.matcher(createdTodo.getURI().toString()).matches(), is(true));
-      assertThat(createdTodo.getId(), is(notNullValue()));
-      assertThat(createdTodo.getTitle(), is(expectedEntity.getTitle()));
-      assertThat(createdTodo.getDescription(), is(expectedEntity.getDescription()));
-      assertThat(createdTodo.getAuthor().getId(), is(expectedEntity.getAuthor().getId()));
-    }
+  public void UpdateAnExistingTodo() {
+    expectedEntity.setDescription("My new description");
+    TodoEntity actualEntity = putAt(aResourceURI(), expectedEntity);
+    assertThat(actualEntity, is(notNullValue()));
+    assertThat(actualEntity, is(expectedEntity));
   }
 
+  // override this method as the default behavior doesn't satisfy the expectation
+  @Override
   @Test
-  public void createInvalidTodo() {
+  public void updateOfAnUnexistingResource() {
     String uri = aResourceURI();
-    TodoEntity invalidTodo = new TodoEntity();
-    try(Response response = post(invalidTodo, uri)) {
-      assertThat(response.getStatus(), is(Response.Status.BAD_REQUEST.getStatusCode()));
+    TodoEntity nonExistingTodo = aNonExistingResource();
+    try {
+      putAt(uri, nonExistingTodo);
+      fail("A user shouldn't update a non existing resource");
     } catch (WebApplicationException ex) {
       int receivedStatus = ex.getResponse().getStatus();
       int notFound = Response.Status.BAD_REQUEST.getStatusCode();
@@ -128,12 +117,12 @@ public class TodoListResourceCreationIT extends ResourceCreationTest {
 
   @Override
   public String aResourceURI() {
-    return TodoListResource.PATH + "/" + TestContext.TODOLIST_ID;
+    return TodoListResource.PATH + "/" + TestContext.TODOLIST_ID + "/" + expectedEntity.getId();
   }
 
   @Override
   public String anUnexistingResourceURI() {
-    return TodoListResource.PATH + "/todolist666";
+    return TodoListResource.PATH + "/" + TestContext.TODOLIST_ID + "/UUID-666";
   }
 
   @Override
@@ -147,8 +136,22 @@ public class TodoListResourceCreationIT extends ResourceCreationTest {
     return expectedEntity;
   }
 
+  public TodoEntity aNonExistingResource() {
+    Todo nonExistingTodo = new Todo(User.getById("1"), "prout", "prout");
+    Reflections.setField(nonExistingTodo, "id", UuidIdentifier.from("UID-666"));
+    return TodoEntity.fromTodo(nonExistingTodo,
+        getWebResourceBaseURIBuilder().path(TodoListResource.PATH));
+  }
+
   @Override
   public Class<TodoEntity> getWebEntityClass() {
     return TodoEntity.class;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public TodoEntity anInvalidResource() {
+    Todo todo = new Todo(User.getById("2"), "Invalid todo", "");
+    return new TodoEntity(todo);
   }
 }

@@ -28,6 +28,7 @@ import org.silverpeas.components.todolist.model.TodoList;
 import org.silverpeas.core.annotation.WebService;
 import org.silverpeas.core.web.rs.RESTWebService;
 import org.silverpeas.core.web.rs.annotation.Authorized;
+import org.silverpeas.kernel.util.StringUtil;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -79,36 +80,76 @@ public class TodoListResource extends RESTWebService {
     return asWebEntities(todoList.getAllTodos());
   }
 
+  @GET
+  @Path("{todoId}")
+  public TodoEntity findTodoById(@PathParam("todoId") String todoId) {
+    return process(() -> {
+      TodoList todoList = TodoList.getById(getComponentId());
+      Todo theTodo = findTodoById(todoId, todoList);
+      return asWebEntity(theTodo);
+    }).execute();
+  }
+
   @Path("{todoId}")
   @DELETE
   public Response removeTodo(@PathParam("todoId") String todoId) {
     return process(() -> {
       TodoList todoList = TodoList.getById(getComponentId());
-      Todo todo = todoList.getAllTodos().stream()
-          .filter(t -> t.getId().equals(todoId))
-          .findFirst()
-          .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
+      Todo todo = findTodoById(todoId, todoList);
       todoList.removeTodo(todo.getId());
       return Response.noContent().build();
     }).execute();
-
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response addTodo(TodoEntity todo) {
-    return process(() -> {
-      TodoList todoList = TodoList.getById(getComponentId());
-      Todo created = todoList.addTodo(new Todo(getUser(), todo.getTitle(), todo.getDescription()));
-      URI newTodoUri = getUriBuilder().path(created.getId()).build();
-      return Response.created(newTodoUri)
-          .entity(asWebEntities(todoList.getAllTodos())).build();
-    }).execute();
+    if (todo.isValid()) {
+      return process(() -> {
+        TodoList todoList = TodoList.getById(getComponentId());
+        Todo created = todoList.addTodo(new Todo(getUser(), todo.getTitle(),
+            todo.getDescription()));
+        URI newTodoUri = getUriBuilder().path(created.getId()).build();
+        return Response.created(newTodoUri)
+            .entity(asWebEntities(todoList.getAllTodos())).build();
+      }).execute();
+    } else {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+  }
+
+  @PUT
+  @Path("{todoId}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public TodoEntity updateTodo(@PathParam("todoId") String todoId, TodoEntity todo) {
+    if (todoId.equals(todo.getId()) && todo.isValid()) {
+      return process(() -> {
+        TodoList todoList = TodoList.getById(getComponentId());
+        Todo actualTodo = findTodoById(todoId, todoList);
+        actualTodo.setDescription(todo.getDescription());
+        actualTodo.save();
+        return asWebEntity(actualTodo);
+      }).execute();
+    } else {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+  }
+
+  private Todo findTodoById(String todoId, TodoList todoList) {
+    return todoList.getAllTodos().stream()
+        .filter(t -> t.getId().equals(todoId))
+        .findFirst()
+        .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
   }
 
   private List<TodoEntity> asWebEntities(final List<Todo> allTodos) {
     return TodoEntity.fromTodos(allTodos, this::getUriBuilder);
+  }
+
+  private TodoEntity asWebEntity(final Todo todo) {
+    return TodoEntity.fromTodo(todo, getUriBuilder());
   }
 
   private UriBuilder getUriBuilder() {

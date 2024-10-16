@@ -1,0 +1,116 @@
+/*
+ * Copyright (C) 2000 - 2024 Silverpeas
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * As a special exception to the terms and conditions of version 3.0 of
+ * the GPL, you may redistribute this Program in connection with Free/Libre
+ * Open Source Software ("FLOSS") applications as described in Silverpeas's
+ * FLOSS exception.  You should have received a copy of the text describing
+ * the FLOSS exception, and it is also available here:
+ * "https://www.silverpeas.org/legal/floss_exception.html"
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.txt-no-content {
+    color: #575757;
+    font-style: italic;
+}
+
+#todolist-alltodos {
+    margin: 50px;
+    display: grid;
+    gap: 15px;
+    grid-template-columns: repeat(auto-fill, 250px);
+}
+
+#todolist-alltodos .todolist-todo {
+    position: relative;
+    background-color:#F0F0F0;
+    border:1px solid #CECECE;
+    border-radius:10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#todolist-alltodos .action {
+    cursor: pointer;
+}
+
+#todolist-alltodos .todolist-todo .action {
+    text-align: end;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+#todolist-alltodos .todolist-todo .action img {
+    width:13px;
+    height: 13px;
+}
+
+#todolist-alltodos .todolist-todo .header {
+    border-radius:10px 10px 0 0;
+    font-size: 0.9em;
+    color:#111;
+    background-color: #ed7261;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding:0 1em;
+}
+
+#todolist-alltodos .todolist-todo p.author {
+    color:#26334A;
+}
+
+#todolist-alltodos .todolist-todo .description {
+    padding: 1em 1em;
+}
+
+#todolist-alltodos .todolist-todo .text {
+    color: #888888;
+    font-family: "Arial", sans-serif;
+    font-size: 1.1em;
+    line-height: 1.2em;
+    margin: 0;
+    padding: 0;
+    text-align: justify;
+    white-space: normal;
+}
+
+#todolist-alltodos .todolist-todo .text a {
+    font-size: 1.1em;
+}
+
+#todo-update-box #todo-update-description,
+#todo-creation-box #todo-creation-description,
+#todo-creation-box #todo-creation-title {
+    width: 95%;
+    height: 10em;
+    font-family: "Arial", sans-serif;
+    font-size: 1.1em;
+    line-height: 1.2em;
+}
+
+#todo-creation-box #todo-creation-title {
+    height: auto;
+}
+
+#todo-creation-box .field {
+   display: inline-block;
+   width: 95%;
+   padding: 1em;
+}
+
